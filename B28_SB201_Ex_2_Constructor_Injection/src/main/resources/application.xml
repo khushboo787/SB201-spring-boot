@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Data for all spring beans has to be written in the beans tag -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd">
+        
+    <!--- create an object of Car -->
+    <bean id="car" class="com.masaischool.B28_SB201_Ex_2_constructor_injection.Car" />
+    
+    <!--- create an object of Bike -->
+    <bean id="bike" class="com.masaischool.B28_SB201_Ex_2_constructor_injection.Bike" />
+        
+    <!-- this will create object of Traveller with default constructor -->
+	<bean id="travelOne" class="com.masaischool.B28_SB201_Ex_2_constructor_injection.Traveller" />
+	
+	<!-- this will create object of Traveller with parameterized constructor -->
+	<bean id="travelTwo" class="com.masaischool.B28_SB201_Ex_2_constructor_injection.Traveller">
+		<constructor-arg ref="car" />
+		<constructor-arg value="5" />
+	</bean>
+	
+	<!-- this will create object of Traveller with parameterized constructor -->
+	<bean id="travelThree" class="com.masaischool.B28_SB201_Ex_2_constructor_injection.Traveller">
+		<constructor-arg ref="bike" />
+		<constructor-arg value="2" />
+	</bean>
+
+</beans>

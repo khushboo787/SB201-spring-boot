@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Swiggy Dashboard</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #f4f4f4;
+            }
+            .tabs {
+                display: flex;
+                justify-content: center;
+                margin-bottom: 20px;
+            }
+            .tab {
+                padding: 10px 20px;
+                background-color: #eee;
+                cursor: pointer;
+            }
+            .tab.active {
+                background-color: #ddd;
+            }
+            .container {
+                max-width: 800px;
+                margin: 20px auto;
+                padding: 20px;
+                background-color: #fff;
+                box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            }
+            .section {
+                display: none;
+            }
+            .section.active {
+                display: block;
+            }
+            .customer {
+                border-bottom: 1px solid #ccc;
+                padding: 10px 0;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            h1 {
+                text-align: center;
+            }
+            button {
+                padding: 5px 10px;
+                background-color: #007bff;
+                color: #fff;
+                border: none;
+                cursor: pointer;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="tabs">
+            <div class="tab active" onclick="showSection('customers')">
+                Customers
+            </div>
+            <div class="tab" onclick="showSection('restaurants')">
+                Restaurants
+            </div>
+            <div class="tab" onclick="showSection('orders')">Orders</div>
+            <div class="tab" onclick="showSection('deliveryPartners')">
+                Delivery Partners
+            </div>
+        </div>
+        <div class="container">
+            <div id="customers" class="section active">
+                <h1>Customer List</h1>
+                <div id="customer-list"></div>
+            </div>
+            <div id="restaurants" class="section">
+                <!-- Restaurant section content goes here -->
+            </div>
+            <div id="orders" class="section">
+                <!-- Orders section content goes here -->
+            </div>
+            <div id="deliveryPartners" class="section">
+                <!-- Delivery Partners section content goes here -->
+            </div>
+        </div>
+
+        <script>
+            const tabs = document.querySelectorAll(".tab");
+            const sections = document.querySelectorAll(".section");
+
+            tabs.forEach((tab) => {
+                tab.addEventListener("click", () => {
+                    tabs.forEach((t) => t.classList.remove("active"));
+                    tab.classList.add("active");
+
+                    const sectionId = tab.textContent
+                        .toLowerCase()
+                        .replace(" ", "");
+                    sections.forEach((section) =>
+                        section.classList.remove("active")
+                    );
+                    document.getElementById(sectionId).classList.add("active");
+                });
+            });
+
+            const customerList = document.getElementById("customer-list");
+            const apiUrl = "http://localhost:8080/customers";
+
+            function showSection(sectionId) {
+                sections.forEach((section) =>
+                    section.classList.remove("active")
+                );
+                document.getElementById(sectionId).classList.add("active");
+            }
+
+            function fetchCustomers() {
+                fetch(apiUrl)
+                    .then((response) => response.json())
+                    .then((customers) => {
+                        customerList.innerHTML = "";
+                        customers.forEach((customer) => {
+                            const customerDiv = document.createElement("div");
+                            customerDiv.className = "customer";
+
+                            const customerInfo = document.createElement("div");
+                            customerInfo.innerHTML = `
+                                <strong>Name:</strong> ${customer.name}<br>
+                                <strong>Email:</strong> ${customer.email}<br>
+                                <strong>Address:</strong> ${customer.address}
+                            `;
+
+                            const actionsDiv = document.createElement("div");
+                            actionsDiv.innerHTML = `
+                                <button onclick="updateCustomer(${customer.customerId})">Update</button>
+                                <button onclick="deleteCustomer(${customer.customerId})">Delete</button>
+                            `;
+
+                            customerDiv.appendChild(customerInfo);
+                            customerDiv.appendChild(actionsDiv);
+                            customerList.appendChild(customerDiv);
+                        });
+                    })
+                    .catch((error) => {
+                        console.error("Error fetching customer data:", error);
+                    });
+            }
+
+            function updateCustomer(customerId) {
+                // Get the updated customer data from user input or fetch it from your UI
+                const updatedCustomerData = {
+                    name: "Updated Name",
+                    email: "updated@example.com",
+                    address: "456 Updated Street",
+                };
+
+                // Send a PUT request to update the customer
+                fetch(`http://localhost:8080/customers/${customerId}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(updatedCustomerData),
+                })
+                    .then((response) => response.json())
+                    .then((updatedCustomer) => {
+                        alert(
+                            `Customer with ID ${customerId} updated successfully.`
+                        );
+                        // You can update your UI or perform additional actions here
+                    })
+                    .catch((error) => {
+                        console.error("Error updating customer:", error);
+                        // Handle errors here
+                    });
+            }
+
+            function deleteCustomer(customerId) {
+                // Send a DELETE request to delete the customer
+                fetch(`http://localhost:8080/customers/${customerId}`, {
+                    method: "DELETE",
+                })
+                    .then((response) => {
+                        if (response.status === 204) {
+                            alert(
+                                `Customer with ID ${customerId} deleted successfully.`
+                            );
+                            location.reload();
+                            // You can update your UI or perform additional actions here
+                        } else {
+                            alert(
+                                `Failed to delete customer with ID ${customerId}.`
+                            );
+                            // Handle errors here
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error deleting customer:", error);
+                        // Handle errors here
+                    });
+            }
+
+            // Initial fetch when the Customers section is loaded
+            fetchCustomers();
+        </script>
+    </body>
+</html>
